@@ -6,4 +6,5 @@ public interface CommandLoader {
 
     boolean unregisterCommand(Object command);
 
+    void unregisterAll();
 }

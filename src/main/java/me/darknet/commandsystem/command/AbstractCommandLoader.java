@@ -8,6 +8,10 @@ import java.util.List;
 
 public abstract class AbstractCommandLoader implements CommandLoader {
 
+    public AbstractCommandLoader() {
+        this.registerParsers();
+    }
+
     List<Object> registered = new ArrayList<>();
 
     public String getBase(String path) {
@@ -46,9 +50,14 @@ public abstract class AbstractCommandLoader implements CommandLoader {
     public boolean unregisterCommand(Object command) {
         if(registered.contains(command)) {
             registered.remove(command);
-            return true;
+            return unregisterCommand0(command);
         }
         return false;
+    }
+
+    @Override
+    public void unregisterAll() {
+        registered.forEach(this::unregisterCommand);
     }
 
     public abstract boolean registerCommand(Command annotation, Arguments arguments, Object command);

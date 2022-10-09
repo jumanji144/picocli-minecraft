@@ -18,4 +18,8 @@ public class CommandManager {
         return this.loader.unregisterCommand(command);
     }
 
+    public void unregisterAll() {
+        this.loader.unregisterAll();
+    }
+
 }
