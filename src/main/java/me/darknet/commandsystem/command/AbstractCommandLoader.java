@@ -4,7 +4,9 @@ import me.darknet.commandsystem.parser.ArgumentParser;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractCommandLoader implements CommandLoader {
 
@@ -24,6 +26,8 @@ public abstract class AbstractCommandLoader implements CommandLoader {
     @Override
     public boolean registerCommand(Object command) {
         Method[] methods = command.getClass().getMethods();
+        Map<String, Arguments> argumentMap = new HashMap<>();
+        Map<String, Map<String, Command>> commandMap = new HashMap<>();
         for(Method method : methods) {
             if(method.isAnnotationPresent(Command.class)) {
                 Command annotation = method.getAnnotation(Command.class);
@@ -35,14 +39,20 @@ public abstract class AbstractCommandLoader implements CommandLoader {
                 }
                 path = path.substring(path.indexOf(".") + 1);
                 Argument[] args = ArgumentParser.parseArguments(path);
-                Arguments arguments = new Arguments();
-                arguments.setBaseName(basePath);
-                arguments.registerMethod(annotation.value(), method);
+                String finalBasePath = basePath;
+                Arguments arguments = argumentMap.computeIfAbsent(basePath, k -> {
+                    Arguments a = new Arguments();
+                    a.setBaseName(finalBasePath);
+                    return a;
+                });
+                arguments.getMethods().put(path, method);
                 arguments.registerArguments(args);
-                if(!this.registerCommand(annotation, arguments, command)) return false;
+                Map<String, Command> commandList = commandMap.computeIfAbsent(basePath, k -> new HashMap<>());
+                commandList.put(path, annotation);
                 registered.add(command);
             }
         }
+        argumentMap.forEach((name, arguments) -> this.registerCommand(commandMap.get(name), arguments, command));
         return true;
     }
 
@@ -60,7 +70,7 @@ public abstract class AbstractCommandLoader implements CommandLoader {
         registered.forEach(this::unregisterCommand);
     }
 
-    public abstract boolean registerCommand(Command annotation, Arguments arguments, Object command);
+    public abstract boolean registerCommand(Map<String, Command> commandMap, Arguments arguments, Object command);
 
     public abstract boolean unregisterCommand0(Object command);
 

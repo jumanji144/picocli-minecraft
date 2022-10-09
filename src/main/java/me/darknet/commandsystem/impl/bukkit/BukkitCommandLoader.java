@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.UUID;
 
 public class BukkitCommandLoader extends AbstractCommandLoader {
@@ -27,8 +28,8 @@ public class BukkitCommandLoader extends AbstractCommandLoader {
     }
 
     @Override
-    public boolean registerCommand(Command annotation, Arguments arguments, Object command) {
-        BukkitCommandDelegate delegate = new BukkitCommandDelegate(command, annotation, arguments);
+    public boolean registerCommand(Map<String, Command> commandMap, Arguments arguments, Object command) {
+        BukkitCommandDelegate delegate = new BukkitCommandDelegate(command, commandMap, arguments);
         try {
             addCommand.invoke(commandMap, plugin.getName(), delegate);
             return true;

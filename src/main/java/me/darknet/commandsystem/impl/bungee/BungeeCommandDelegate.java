@@ -15,9 +15,12 @@ public class BungeeCommandDelegate extends Command {
     private final Object delegate;
     private final Arguments arguments;
 
-    public BungeeCommandDelegate(Object delegate, me.darknet.commandsystem.command.Command command, Arguments arguments) {
-        super(arguments.getBasePath(), command.permission(), command.aliases());
+    private final Map<String, me.darknet.commandsystem.command.Command> commandMap;
+
+    public BungeeCommandDelegate(Object delegate, Map<String, me.darknet.commandsystem.command.Command> commandMap, Arguments arguments) {
+        super(arguments.getBasePath());
         this.delegate = delegate;
+        this.commandMap = commandMap;
         this.arguments = arguments;
     }
 

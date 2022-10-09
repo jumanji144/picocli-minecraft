@@ -37,7 +37,11 @@ public class Arguments {
 
     public Argument[] lookup(String[] paths) {
         List<Argument> track = new ArrayList<>();
-        lookup(paths, 0, builtTree.getRoot().getChildren(), track);
+        ArgumentNode baseNode = builtTree.getRoot().getNode(baseName);
+        if(paths.length == 0) { // arguments passed -> base command
+            return new Argument[] { baseNode.getEntry() };
+        }
+        lookup(paths, 0, baseNode.getChildren(), track);
         return track.toArray(new Argument[0]);
     }
 

@@ -9,6 +9,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class BungeeCommandLoader extends AbstractCommandLoader {
@@ -20,8 +21,8 @@ public class BungeeCommandLoader extends AbstractCommandLoader {
     }
 
     @Override
-    public boolean registerCommand(Command annotation, Arguments arguments, Object command) {
-        BungeeCommandDelegate delegate = new BungeeCommandDelegate(command, annotation, arguments);
+    public boolean registerCommand(Map<String, Command> commandMap, Arguments arguments, Object command) {
+        BungeeCommandDelegate delegate = new BungeeCommandDelegate(command, commandMap, arguments);
         ProxyServer.getInstance().getPluginManager().registerCommand(plugin, delegate);
         return true;
     }

@@ -20,23 +20,18 @@ public class BukkitCommandDelegate extends BukkitCommand {
     private final Arguments arguments;
     private final Object delegate;
 
-    private final Command command;
+    private final Map<String, Command> commands;
 
-    public BukkitCommandDelegate(Object delegate, Command command, Arguments arguments) {
-        super(arguments.getBasePath(), command.description(), command.usage(), Arrays.asList(command.aliases()));
-        this.setPermission(command.permission());
-        this.setPermissionMessage(command.noPermission());
+    public BukkitCommandDelegate(Object delegate, Map<String, Command> commandMap, Arguments arguments) {
+        super(arguments.getBasePath());
         this.delegate = delegate;
         this.arguments = arguments;
-        this.command = command;
+        this.commands = commandMap;
     }
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         Argument[] arguments = this.arguments.lookup(args); // lookup which command we are referring to
-        if(arguments.length == 0 || arguments[0] == null) { // invalid command
-            return false;
-        }
 
         // build arguments into a path for the command
         String path = ArgumentParser.toPath(arguments);
