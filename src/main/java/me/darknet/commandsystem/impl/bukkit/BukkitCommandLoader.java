@@ -19,7 +19,7 @@ import java.util.UUID;
 public class BukkitCommandLoader extends AbstractCommandLoader {
 
     private static final Method addCommand;
-    private static final Object commandMap;
+    private static final Object commandMapObject;
     private final Plugin plugin;
 
     public BukkitCommandLoader(Plugin plugin) {
@@ -31,7 +31,7 @@ public class BukkitCommandLoader extends AbstractCommandLoader {
     public boolean registerCommand(Map<String, Command> commandMap, Arguments arguments, Object command) {
         BukkitCommandDelegate delegate = new BukkitCommandDelegate(command, commandMap, arguments);
         try {
-            addCommand.invoke(commandMap, plugin.getName(), delegate);
+            addCommand.invoke(commandMapObject, plugin.getName(), delegate);
             return true;
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -45,9 +45,9 @@ public class BukkitCommandLoader extends AbstractCommandLoader {
             Field field = org.bukkit.command.Command.class.getDeclaredField("name");
             field.setAccessible(true);
             Object bukkitCommand = field.get(command);
-            field = commandMap.getClass().getDeclaredField("knownCommands");
+            field = commandMapObject.getClass().getDeclaredField("knownCommands");
             field.setAccessible(true);
-            Object map = field.get(commandMap);
+            Object map = field.get(commandMapObject);
             field.setAccessible(true);
             Method remove = map.getClass().getDeclaredMethod("remove", Object.class);
             remove.setAccessible(true);
@@ -121,8 +121,8 @@ public class BukkitCommandLoader extends AbstractCommandLoader {
             Class<?> simplePluginManager = Class.forName("org.bukkit.plugin.SimplePluginManager");
             Field commandMapField = simplePluginManager.getDeclaredField("commandMap");
             commandMapField.setAccessible(true);
-            commandMap = commandMapField.get(Bukkit.getPluginManager());
-            addCommand = commandMap.getClass().getDeclaredMethod("register", String.class, org.bukkit.command.Command.class);
+            commandMapObject = commandMapField.get(Bukkit.getPluginManager());
+            addCommand = commandMapObject.getClass().getDeclaredMethod("register", String.class, org.bukkit.command.Command.class);
         } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
