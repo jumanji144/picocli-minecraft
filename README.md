@@ -7,7 +7,7 @@ To define a command simply use the `@Command` annotation like this:
 
 public class AnyClass {
     
-    @Command("command.subcommand")
+    @Command("command.subcommand.<number:int>.submit")
     public void onCommand(CommandContext ctx) {
         // Do something
     }
