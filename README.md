@@ -46,7 +46,106 @@ public final class Test extends JavaPlugin {
 }
 ```
 `CommandManager` also allows you to define the help color scheme via `setColorScheme`
+## Examples
+`SpawnCommand`
+```java
+@Command(
+        name = "spawn",
+        description = "Spawn entities or blocks"
+)
+public class SpawnCommand extends BukkitBase {
 
+    @Command(
+            name = "entity",
+            description = "Spawn an entity"
+    )
+    public int spawnEntity(@Parameters(paramLabel = "type", description = "The entity type to spawn") EntityType type) {
+        if(getSender() instanceof Player) {
+            Player player = (Player) getSender();
+            player.getWorld().spawnEntity(player.getLocation(), type);
+            return 0;
+        } else {
+            getSender().sendMessage("You must be a player to use this command");
+            return 1;
+        }
+    }
+
+    @Command(
+            name = "block",
+            description = "Spawn a block"
+    )
+    public int spawnBlock(@Parameters(paramLabel = "type", description = "The block type to spawn") Material material) {
+        if(getSender() instanceof Player) {
+            Player player = (Player) getSender();
+            player.getWorld().getBlockAt(player.getLocation()).setType(material);
+            return 0;
+        } else {
+            getSender().sendMessage("You must be a player to use this command");
+            return 1;
+        }
+    }
+
+    @Override
+    public int execute() {
+        // make it show the help message
+        throw new ParameterException(getCommandLine(), "You must specify a subcommand");
+    }
+}
+```
+`TeleportCommand`
+```java
+@Command(
+        name = "teleport",
+        description = "Teleport players to a location",
+        mixinStandardHelpOptions = true
+)
+public class TeleportCommand extends BukkitBase {
+
+    @Parameters(description = "The x coordinate to teleport to", arity = "0..1", defaultValue = "_NULL_")
+    Optional<Double> x;
+
+    @Parameters(description = "The y coordinate to teleport to", arity = "0..1", defaultValue = "_NULL_")
+    Optional<Double> y;
+
+    @Parameters(description = "The z coordinate to teleport to", arity = "0..1", defaultValue = "_NULL_")
+    Optional<Double> z;
+
+    @Option(names = {"-p", "--player"}, description = "The player to teleport", arity = "0..1", defaultValue = "_NULL_")
+    Optional<Player> player;
+
+    @Option(names = {"-w", "--world"}, description = "The world to teleport to", arity = "0..1", defaultValue = "_NULL_")
+    Optional<World> world;
+
+
+    @Override
+    public int execute() {
+        Player executor = null;
+        if(getSender() instanceof Player) {
+            executor = (Player) getSender();
+        }
+        Player target = player.orElse(executor);
+        if(target == null) {
+            getSender().sendMessage(ChatColor.RED + "You must be a player to use this command");
+            return 1;
+        }
+        World world = this.world.orElseGet(target::getWorld);
+        if(x.isPresent() && y.isPresent() && z.isPresent()) {
+            target.teleport(new Location(world, x.get(), y.get(), z.get()));
+        } else {
+            if(target != executor) {
+                target.teleport(executor);
+            } else {
+                if(player.isPresent()) {
+                    getSender().sendMessage(ChatColor.RED + "You cannot teleport to yourself!");
+                } else {
+                    throw new ParameterException(getCommandLine(), "You must specify a location to teleport to");
+                }
+            }
+        }
+        return 0;
+    }
+}
+```
 ## Credits
 - [picocli](https://github.com/remkop/picocli)
 - [objectweb](https://asm.ow2.io/)
