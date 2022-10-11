@@ -1,80 +1,52 @@
-# Command System
-A simple command system that parses arguments directly.
+# Picocli Minecraft
+This project is small wrapper around [picocli](https://github.com/remkop/picocli) in the use of a command system.
 
 ## Usage
-To define a command simply use the `@Command` annotation like this:
+The command system is highly oriented around the already existing picocli syntax with a few extra added things.     
+To register commands you must create a class that extends the respective platform base. After that picocli syntax can follow, with the
+exception that there is a added annotation `@Permission` that can be added to `@Command` annotated classes or methods that will check for the
+given permission before execution.       
+For execution the `Base` class requires you to implement the `int execute()` method. For context related values the respetive 
+Example for bukkit:
 ```java
+@Command(
+        name = "teleport",
+        description = "Teleport players to a location",
+        mixinStandardHelpOptions = true
+)
+@Permission(permission = "teleport.use")
+public class TeleportCommand extends BukkitBase {
 
-public class AnyClass {
+    @Option(names = {"-p"}, description="Player to teleport to", required=true)
+    private Player p;
     
-    @Command("command.subcommand.<number:int>.submit")
-    public void onCommand(CommandContext ctx) {
-        // Do something
+    public int execute() {
+        if(getSender() instanceof Player) {
+            ((Player)getSender()).teleport(p);
+        }
     }
-    
+
 }
 ```
-To define more complex commands with arguments you simply define a path   
-For example: `command.subcommand` will be parsed as `command` and `subcommand`
-
-### Argument parsing
-The command system will automatically parse arguments for you given types.   
-to use them simply add `<name:type>` to your command path and the context
-will contain a argument with the parsed object
-
-### Type parsers
-For the types there needs to be a parser present, for primitives (int, double, etc.)
-there is a default parser, but for custom types you need to register a parser via
-`ArgumentParser.registerParser(String, Function<String, ?>)` where the first argument is the corresponding type name and
-the second argument is a function that parses the string to the type.
-
-## Setup
-
-To use the system you simply construct a `CommandManager` with a `CommandLoader`.
-Then to register commands simply use `CommandManager.registerCommands(Object)`. where Object is the class containing
-atleast one `@Command` annotated method.
-The plugins comes shipped with done implementations for both bukkit and bungeecord.
-
-### Bukkit example
+To then register the commands a `CommandManager` must be created and given a platform respective `ICommandRegistrar`.    
+Bukkit example:
 ```java
-public class MyPlugin extends JavaPlugin {
-    
-    private CommandManager commandManager;
-    
+public final class Test extends JavaPlugin {
+
     @Override
     public void onEnable() {
-        this.commandManager = new CommandManager(new BukkitCommandLoader(this));
-        this.commandManager.registerCommand(new AnyClass());
+        CommandManager manager = new CommandManager(new BukkitCommandRegistrar(this));
+        manager.register(new TeleportCommand());
     }
-    
+
     @Override
     public void onDisable() {
-        this.commandManager.unregisterAll();
+        // Plugin shutdown logic
     }
-    
 }
 ```
+`CommandManager` also allows you to define the help color scheme via `setColorScheme`
 
-### BungeeCord example
-```java
-public class MyPlugin extends Plugin {
-    
-    private CommandManager commandManager;
-    
-    @Override
-    public void onEnable() {
-        this.commandManager = new CommandManager(new BungeeCommandLoader(this));
-        this.commandManager.registerCommand(new AnyClass());
-    }
-    
-    @Override
-    public void onDisable() {
-        this.commandManager.unregisterAll();
-    }
-    
-}
-```
-
-## API
-While in the command methods you can use the `CommandContext` to get the sender and arguments.   
-The most important method is `CommandContext#getArgument(String)` which will return the argument with the given name.
+## Credits
+- [picocli](https://github.com/remkop/picocli)
+- [objectweb](https://asm.ow2.io/)
