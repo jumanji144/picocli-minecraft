@@ -20,6 +20,8 @@ public class BukkitCommandDelegate extends BukkitCommand {
     protected BukkitCommandDelegate(CommandLine cli) {
         super(cli.getCommandSpec().name(), "", "", Arrays.asList(cli.getCommandSpec().aliases()));
         this.cli = cli;
+        BukkitBase base = (BukkitBase) cli.getCommandSpec().userObject();
+        base.setCommandLine(cli);
         this.executor = (ExecutorIntercept) cli.getExecutionStrategy(); // guaranteed to be an instance of ExecutorIntercept
     }
 
