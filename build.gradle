@@ -1,10 +1,10 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
 group = 'me.darknet'
-version = '1.0-SNAPSHOT'
+version = '1.0-beta'
 
 repositories {
     mavenCentral()
@@ -20,19 +20,21 @@ repositories {
     }
 }
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_17
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok:1.18.20'
-    // bungeecord
     compileOnly 'net.md-5:bungeecord-api:1.8-SNAPSHOT'
+    api 'info.picocli:picocli:4.6.3'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
 
     // junit
     testImplementation group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
