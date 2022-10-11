@@ -4,13 +4,13 @@ import me.darknet.cli.hack.ExecutorIntercept;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
+import picocli.AutoComplete;
 import picocli.CommandLine;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class BukkitCommandDelegate extends BukkitCommand {
 
@@ -31,6 +31,14 @@ public class BukkitCommandDelegate extends BukkitCommand {
 
         cli.setErr(stream);
         cli.setOut(stream);
+        cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+            if(ex instanceof CommandLine.TypeConversionException) {
+                sender.sendMessage(ChatColor.RED + ex.getMessage());
+            } else {
+                throw ex;
+            }
+            return 0;
+        });
 
         // this is very hacky, only works if command execution is synchronous
         BukkitBase base = cli.getCommand(); // hack
@@ -45,10 +53,22 @@ public class BukkitCommandDelegate extends BukkitCommand {
         return ret == 0;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        List<CharSequence> completions = new ArrayList<>();
+        String lastArg = args.length > 0 ? args[args.length - 1] : "";
+        int argsLength = args.length == 0 ? 0 : args.length - 1;
+        AutoComplete.complete(cli.getCommandSpec(), args, argsLength, lastArg.length(), lastArg.length(), completions);
+        List<String> ret = new ArrayList<>();
+        for (CharSequence completion : completions) {
+            ret.add(lastArg + completion.toString());
+        }
+        return ret;
+    }
+
     private static class SenderPrintStream extends PrintWriter {
 
         private final CommandSender sender;
-        private static final Map<String, Character> ansiToMinecraft = new HashMap<>();
 
         public SenderPrintStream(CommandSender sender) {
             super(System.out);
@@ -98,37 +118,6 @@ public class BukkitCommandDelegate extends BukkitCommand {
         @Override
         public void print(Object obj) {
             sender.sendMessage(String.valueOf(obj));
-        }
-
-        static {
-            ansiToMinecraft.put("\u001B[0m", 'r'); // reset
-            ansiToMinecraft.put("\u001B[1m", 'l'); // bold
-            ansiToMinecraft.put("\u001B[2m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[3m", 'o'); // italic
-            ansiToMinecraft.put("\u001B[4m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[5m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[6m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[7m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[8m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[9m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[30m", '0'); // black
-            ansiToMinecraft.put("\u001B[31m", '4'); // dark red
-            ansiToMinecraft.put("\u001B[32m", '2'); // dark green
-            ansiToMinecraft.put("\u001B[33m", '6'); // dark yellow
-            ansiToMinecraft.put("\u001B[34m", '1'); // dark blue
-            ansiToMinecraft.put("\u001B[35m", '5'); // dark purple
-            ansiToMinecraft.put("\u001B[36m", '3'); // dark aqua
-            ansiToMinecraft.put("\u001B[37m", '7'); // dark gray
-            ansiToMinecraft.put("\u001B[38m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[39m", 'f'); // white
-            ansiToMinecraft.put("\u001B[40m", 'n'); // underline
-            ansiToMinecraft.put("\u001B[41m", '4'); // red
-            ansiToMinecraft.put("\u001B[42m", '2'); // green
-            ansiToMinecraft.put("\u001B[43m", '6'); // yellow
-            ansiToMinecraft.put("\u001B[44m", '1'); // blue
-            ansiToMinecraft.put("\u001B[45m", '5'); // purple
-            ansiToMinecraft.put("\u001B[46m", '3'); // aqua
-            ansiToMinecraft.put("\u001B[47m", '7'); // gray
         }
 
     }
