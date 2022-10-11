@@ -111,7 +111,8 @@ public class ExecutorIntercept extends CommandLine.RunLast {
         } else if (command instanceof Method) {
             try {
                 Method method = (Method) command;
-                Object[] parsedArgs = Reflection.invoke(parsed, "commandMethodParamValues()[java/lang/Object;");
+                Object[] parsedArgs = Reflection.invoke(parsed.getCommandSpec(),
+                        "commandMethodParamValues()[java/lang/Object;");
                 Object executionResult;
                 if (Modifier.isStatic(method.getModifiers())) {
                     executionResult = method.invoke(null, parsedArgs); // invoke static method
