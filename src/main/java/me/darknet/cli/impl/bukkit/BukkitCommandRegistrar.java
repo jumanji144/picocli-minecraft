@@ -69,12 +69,12 @@ public class BukkitCommandRegistrar implements ICommandRegistrar {
         Map<String, CommandLine.Help.Ansi.IStyle> markupMap = new HashMap<>();
         markupMap.put("reset", BukkitStyle.reset);
         return new CommandLine.Help.ColorScheme.Builder(CommandLine.Help.Ansi.ON)
-                .commands(BukkitStyle.bold)
+                .commands(BukkitStyle.white)
                 .options(BukkitStyle.yellow)
-                .parameters(BukkitStyle.yellow)
-                .optionParams(BukkitStyle.italic)
-                .errors(BukkitStyle.bold)
-                .stackTraces(BukkitStyle.italic)
+                .parameters(BukkitStyle.green)
+                .errors(BukkitStyle.red)
+                .stackTraces(BukkitStyle.red)
+                .optionParams(BukkitStyle.green)
                 .customMarkupMap(markupMap)
                 .build();
     }
