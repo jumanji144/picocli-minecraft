@@ -6,6 +6,7 @@ This project is small wrapper around [picocli](https://github.com/remkop/picocli
 
 - [Usage](#usage)
     - [Bukkit](#bukkit)
+    - [BungeeCord](#bungeecord)
 - [Examples](#examples)
 - [Installation](#installation)
     - [Maven](#maven)
@@ -15,7 +16,7 @@ This project is small wrapper around [picocli](https://github.com/remkop/picocli
 ## Usage
 The command system is highly oriented around the already existing picocli syntax with a few extra added things.     
 To register commands you must create a class that extends the respective platform base. After that picocli syntax can follow, with the
-exception that there is a added annotation `@Permission` that can be added to `@Command` annotated classes or methods that will check for the
+exception that there is an added annotation `@Permission` that can be added to `@Command` annotated classes or methods that will check for the
 given permission before execution.       
 For execution the `Base` class requires you to implement the `int execute()` method. For context related values the respetive 
 Example for bukkit:
