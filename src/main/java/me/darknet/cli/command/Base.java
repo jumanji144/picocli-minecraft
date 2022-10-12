@@ -25,4 +25,8 @@ public abstract class Base implements Callable<Integer> {
     public void setCommandLine(CommandLine commandLine) {
         this.commandLine = commandLine;
     }
+
+    public int stub() {
+        throw new CommandLine.ParameterException(getCommandLine(), "You must specify a subcommand");
+    }
 }
