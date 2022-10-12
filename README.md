@@ -1,5 +1,16 @@
 # Picocli Minecraft
+[![](https://jitpack.io/v/Nowilltolife/picocli-minecraft.svg)](https://jitpack.io/#Nowilltolife/picocli-minecraft)
+[![](https://img.shields.io/github/license/Nowilltolife/picocli-minecraft)](https://github.com/Nowilltolife/picocli-minecraft)
+
 This project is small wrapper around [picocli](https://github.com/remkop/picocli) in the use of a command system.
+
+- [Usage](#usage)
+    - [Bukkit](#bukkit)
+- [Examples](#examples)
+- [Installation](#installation)
+    - [Maven](#maven)
+    - [Gradle](#gradle)
+- [Credits](#credits)
 
 ## Usage
 The command system is highly oriented around the already existing picocli syntax with a few extra added things.     
@@ -29,7 +40,7 @@ public class TeleportCommand extends BukkitBase {
 }
 ```
 To then register the commands a `CommandManager` must be created and given a platform respective `ICommandRegistrar`.    
-Bukkit example:
+### Bukkit
 ```java
 public final class Test extends JavaPlugin {
 
@@ -144,6 +155,38 @@ public class TeleportCommand extends BukkitBase {
         }
         return 0;
     }
+}
+```
+
+## Installation
+To use this library in your own project you must add the following based on your platform:   
+### Maven
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.github.Nowilltolife</groupId>
+        <artifactId>picocli-minecraft</artifactId>
+        <version>master-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+```
+### Gradle
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+```
+```groovy
+dependencies {
+    implementation 'com.github.Nowilltolife:picocli-minecraft:master-SNAPSHOT'
 }
 ```
 ## Credits
