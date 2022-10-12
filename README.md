@@ -56,6 +56,22 @@ public final class Test extends JavaPlugin {
     }
 }
 ```
+### BungeeCord
+```java
+public final class Test extends Plugin {
+
+    @Override
+    public void onEnable() {
+        CommandManager manager = new CommandManager(new BungeeCommandRegistrar(this));
+        manager.register(new TeleportCommand());
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+}
+```
 `CommandManager` also allows you to define the help color scheme via `setColorScheme`
 ## Examples
 `SpawnCommand`
