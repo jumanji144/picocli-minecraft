@@ -36,6 +36,7 @@ public class BukkitCommandRegistrar implements ICommandRegistrar {
     }
 
     private final Map<String, BukkitCommandDelegate> commandMap = new HashMap<>();
+    private final Map<Object, BukkitCommandDelegate> baseToDelegate = new HashMap<>();
 
     @Override
     public void registerCommand(CommandLine cli) {
@@ -43,6 +44,7 @@ public class BukkitCommandRegistrar implements ICommandRegistrar {
         BukkitCommandDelegate delegate = new BukkitCommandDelegate(cli);
         // register delegate
         commandMap.put(cli.getCommandName(), delegate);
+        baseToDelegate.put(cli.getCommand(), delegate);
         try {
             registerCommand.invoke(commandMapObj, plugin.getName(), delegate);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -52,13 +54,17 @@ public class BukkitCommandRegistrar implements ICommandRegistrar {
 
     @Override
     public void unregisterCommand(CommandLine cli) {
-        this.unregisterCommand(commandMap.get(cli.getCommandName()));
+        try {
+            unregisterCommand.invoke(pureMapObject, commandMap.get(cli.getCommandName()));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void unregisterCommand(Object command) {
         try {
-            unregisterCommand.invoke(pureMapObject, command);
+            unregisterCommand.invoke(pureMapObject, baseToDelegate.get(command));
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
