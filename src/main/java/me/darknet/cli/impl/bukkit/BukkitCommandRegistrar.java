@@ -26,7 +26,7 @@ import java.util.Map;
 public class BukkitCommandRegistrar implements ICommandRegistrar {
 
     private static final Object commandMapObj;
-    private static final Object pureMapObject;
+    private static Object pureMapObject;
     private static final Method registerCommand;
     private static final Method unregisterCommand;
     private final Plugin plugin;
@@ -99,14 +99,23 @@ public class BukkitCommandRegistrar implements ICommandRegistrar {
         if(manager instanceof SimplePluginManager) {
             try {
                 commandMapObj = Reflection.fieldGet(manager, "commandMap");
-                pureMapObject = Reflection.fieldGet(commandMapObj, "knownCommands");
+                try {
+                    pureMapObject = Reflection.fieldGet(commandMapObj, "knownCommands");
+                } catch (NoSuchFieldException e) {
+                    // knownCommands field is hidden in 1.13+, but we can still get it
+                    try {
+                        pureMapObject = Reflection.invoke(commandMapObj, "getKnownCommands()Ljava/util/Map;");
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+                        throw new RuntimeException("Unsupported command map, map == " + commandMapObj, ex);
+                    }
+                }
                 registerCommand = Reflection.lookupMethod(CommandMap.class,
                         "register(Ljava/lang/String;Lorg/bukkit/command/Command;)Z");
                 // no unregister method, just point to the map `remove` method
                 unregisterCommand = Reflection.lookupMethod(Map.class,
                         "remove(Ljava/lang/Object;)Ljava/lang/Object;");
             } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Unsupported command map, map == " + manager, e);
             }
         } else {
             throw new RuntimeException("Unsupported plugin manager, manager == " + manager);
