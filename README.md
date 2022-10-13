@@ -191,7 +191,7 @@ To use this library in your own project you must add the following based on your
     <dependency>
         <groupId>com.github.Nowilltolife</groupId>
         <artifactId>picocli-minecraft</artifactId>
-        <version>1.0-beta</version>
+        <version>1.1.1-beta</version>
     </dependency>
 </dependencies>
 ```
@@ -203,7 +203,7 @@ repositories {
 ```
 ```groovy
 dependencies {
-    implementation 'com.github.Nowilltolife:picocli-minecraft:1.0-beta'
+    implementation 'com.github.Nowilltolife:picocli-minecraft:1.1.1-beta'
 }
 ```
 ## Credits
